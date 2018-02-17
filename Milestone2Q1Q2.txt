@@ -1,0 +1,52 @@
+
+--My Solution
+select listagg(r3.ename,',')
+within group(order by r3.rname) as Entities
+from relates r3 inner join relates r4
+on r3.rname=r4.rname
+and
+exists
+( 
+select distinct r1.rname,r1.ename
+from relates r1,relates r2
+where r1.ename=r2.ename
+)
+and
+r3.ename<>r4.ename
+group by r3.rname;
+
+--Surbhi's Solution
+
+select distinct entity2,entity4
+from
+(
+select r1.rname as Rel1,r1.ename as Entity1,r2.ename as Entity2
+from relates r1,relates r2
+where r1.rname=r2.rname
+and
+r1.ename!=r2.ename)
+join
+(
+select r3.rname as rel3,r3.ename as entity3,r4.ename as entity4
+from relates r3,relates r4
+where r3.rname=r4.rname
+and
+r3.ename!=r4.ename)
+on entity1!=entity3
+where entity2!=entity4;
+
+--Query 1
+select distinct r1.ename as Ename1,r4.ename as ename2
+from relates r1
+inner join
+relates r2
+on
+r1.rname=r2.rname
+inner join
+relates r3
+on r2.ename=r3.ename
+inner join
+relates r4
+on
+r3.rname=r4.rname
+where r3.ename<r2.ename;

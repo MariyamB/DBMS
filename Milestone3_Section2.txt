@@ -1,0 +1,190 @@
+--Section 2
+
+1)--View Ents_2hops 
+Create view Ents_2hops AS
+select distinct r3.ename as Entity1,r1.ename as Entity2
+from relates r1 inner join 
+relates r2
+on
+r1.rname=r2.rname
+inner join
+relates r3
+on r2.ename!=r3.ename
+where r3.ename<r2.ename
+and
+r1.ename!=r3.ename
+and r1.ename
+not in
+(
+select distinct r4.ename
+from relates r4,relates r5
+where r4.rname!=r5.rname
+and r4.ename=r5.ename
+)
+and r3.ename
+not in
+(
+select distinct r7.ename
+from relates r6,relates r7
+where r6.rname!=r7.rname
+and r6.ename=r7.ename
+);
+
+
+SQL> select * from ents_2hops;
+
+ENTITY1                        ENTITY2
+------------------------------ ------------------------------
+Room                           grad_student
+
+
+2)--View Ents_2hops_attr
+
+ Create view Ents_2hops AS
+ select distinct r3.ename as Entity1,r1.ename as Entity2
+ from relates r1 inner join
+ relates r2
+ on
+ r1.rname=r2.rname
+ inner join
+ relates r3
+ on r2.ename!=r3.ename
+ where r3.ename<r2.ename
+ and
+ r1.ename!=r3.ename
+ and r1.ename
+ not in
+ (
+ select distinct r4.ename
+ from relates r4,relates r5
+ where r4.rname!=r5.rname
+ and r4.ename=r5.ename
+ )
+ and r3.ename
+ not in
+ (
+ select distinct r7.ename
+ from relates r6,relates r7
+ where r6.rname!=r7.rname
+ and r6.ename=r7.ename
+ );
+
+SQL> select * from ents_2hops_attr;
+
+no rows selected
+
+3)--View Rel_2Ent
+
+Create view Rel_2Ent AS
+ select distinct r.rname,c.ename
+ from relates r,contains c,rel_type r1
+ where c.ename
+ in
+ (
+ select ename
+ from contains 
+ where r.ename=contains.ename
+ group by ename
+ having count(ename)>2
+ )
+ and type=2;
+ 
+ 
+SQL> select * from rel_2ent;
+
+RNAME                          ENAME
+------------------------------ ------------------------------
+advices                        Grant
+consists                       Grant
+
+4)--View spec_super_ent
+
+Create view Spec_Super_Ent AS
+select sname,s.ename,c.aname
+from specialization s,contains c
+where c.ename=s.ename;
+ 
+
+SQL> select * from spec_super_ent;
+
+SNAME                          ENAME
+------------------------------ ------------------------------
+ANAME
+------------------------------
+ISA                            person
+City
+
+ISA                            person
+DOB
+
+must_be                        student
+Degree
+
+
+SNAME                          ENAME
+------------------------------ ------------------------------
+ANAME
+------------------------------
+ISA                            person
+FName
+
+ISA                            person
+LName
+
+ISA                            person
+Minit
+
+
+SNAME                          ENAME
+------------------------------ ------------------------------
+ANAME
+------------------------------
+ISA                            person
+Name
+
+ISA                            person
+SSN
+
+ISA                            person
+State
+
+
+SNAME                          ENAME
+------------------------------ ------------------------------
+ANAME
+------------------------------
+ISA                            person
+Street
+
+ISA                            person
+Zip
+
+ISA                            person
+age
+
+
+12 rows selected.
+
+
+5)--View spec_sub_ents
+Create view Spec_Sub_Ents AS
+select sname,s.ename,c.aname
+from sub s,contains c
+where c.ename=s.ename;
+
+SQL> select * from spec_sub_ents;
+
+SNAME                          ENAME
+------------------------------ ------------------------------
+ANAME
+------------------------------
+ISA                            student
+Degree
+
+ISA                            faculty
+Is_Tenured
+
+ISA                            faculty
+Salary
+
+

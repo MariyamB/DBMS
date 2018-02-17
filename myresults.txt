@@ -1,0 +1,131 @@
+SQL> 
+SQL> --
+SQL> -- Team Number: 4
+SQL> -- Team Members: Mariyam Rajeev George
+SQL> -- My SQL Statements
+SQL> --
+SQL> 
+SQL> --
+SQL> -- reduce the widths of column being printed
+SQL> -- column cname format A10;
+SQL> -- column bname format A15;
+SQL> --
+SQL> --Q1:
+SQL> select cname
+  2  from account
+  3  where bname
+  4  in
+  5  (
+  6  select account.bname
+  7  from
+  8  account,branch
+  9  where cname
+ 10  in
+ 11  (
+ 12  select cname
+ 13  from account
+ 14  group by cname
+ 15  having count(cname)=2
+ 16  )
+ 17  and
+ 18  lower(bcity)='edina'
+ 19  and
+ 20  account.bname=branch.bname
+ 21  )
+ 22  group by cname
+ 23  having count(distinct(bname))=2;
+
+CNAME                                                                           
+---------------                                                                 
+Jones                                                                           
+Rahimi                                                                          
+Cook                                                                            
+
+SQL> 
+SQL> -- Q2:
+SQL> --Display the customers whos loans in any branch that Jones and Cook do not have loans in.
+SQL> 
+SQL> select distinct l4.cname
+  2  from
+  3  loan l4
+  4  where
+  5  lower(l4.cname) NOT IN ('cook','jones')
+  6  and
+  7  not exists
+  8  (
+  9  select
+ 10  bname
+ 11  from
+ 12  loan
+ 13  where
+ 14  lower(cname) IN ('jones','cook')
+ 15  and
+ 16  bname
+ 17  in
+ 18  (
+ 19  select l6.bname
+ 20  from loan l6
+ 21  where l4.cname=l6.cname
+ 22  )
+ 23  );
+
+no rows selected
+
+SQL> 
+SQL> --Q3:
+SQL> --Print the names of all customers who have one or more account
+SQL> --in any branch that Jones has an account in and these customers have ac account in every branch
+SQL> --that has an account holders living in Edina but not loan holders.
+SQL> select distinct a1.cname
+  2  from account a1
+  3  where exists
+  4  (
+  5  select bname
+  6  from account
+  7  where
+  8  lower(cname)='jones'
+  9  and
+ 10  bname
+ 11  in
+ 12  (
+ 13  select bname
+ 14  from account a2
+ 15  where
+ 16  lower(a2.cname)<>'jones'
+ 17  and
+ 18  a1.cname=a2.cname
+ 19  )
+ 20  )
+ 21  intersect
+ 22  select distinct a1.cname
+ 23   from account a1
+ 24   where not exists
+ 25  (
+ 26  select bname
+ 27  from branch
+ 28  where lower(bcity)='edina'
+ 29  and
+ 30  bname
+ 31  not in
+ 32  (
+ 33  select a2.bname
+ 34  from account a2,branch
+ 35  where lower(bcity)='edina'
+ 36  and
+ 37  a2.cname
+ 38  not in
+ 39  (
+ 40  select cname
+ 41  from loan,branch
+ 42  where lower(branch.bcity)='edina'
+ 43  )
+ 44  )
+ 45  );
+
+no rows selected
+
+SQL> 
+SQL> 
+SQL> 
+SQL> -- Close the spool file
+SQL> spool off;

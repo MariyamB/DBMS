@@ -1,0 +1,191 @@
+-- capture the results into a text file to print later
+--
+spool C:\Users\kochu\Downloads\Steps\Steps\Milestone 3_results.txt
+
+-- setup the width and height of the page to print
+--
+set linesize 80;
+set pagesize 64;
+
+-- Set echo on so that you can see the input as well in the spool file
+set echo on;
+
+--
+-- Team Number: 4
+-- Team Members: Zolboo Tsogbayar, Mariyam George, Helai Li
+-- Milestone 2
+--
+
+--
+-- reduce the widths of column being printed
+-- column cname format A10;
+-- column bname format A15;
+--
+--Q1: Ents_2hops: This view returns the name of every entity and entity (or entities)
+--that are related to the 2 hops away. For example, if E1 is related to E2 via R2
+--and the E2 is related to E3 via R3 and E2 is related to E4 via R, we want to print
+--the following 2 lines:
+--E1, E3
+--E1, E4
+
+Create view Ents_2hops AS
+select distinct r3.ename as Entity1,r1.ename as Entity2
+from relates r1 inner join 
+relates r2
+on
+r1.rname=r2.rname
+inner join
+relates r3
+on r2.ename!=r3.ename
+where r3.ename<r2.ename
+and
+r1.ename!=r3.ename
+and r1.ename
+not in
+(
+select distinct r4.ename
+from relates r4,relates r5
+where r4.rname!=r5.rname
+and r4.ename=r5.ename
+)
+and r3.ename
+not in
+(
+select distinct r7.ename
+from relates r6,relates r7
+where r6.rname!=r7.rname
+and r6.ename=r7.ename
+);
+
+
+--Q2: Ents_2hops_attr: Repeat question 1 but this time print not only the name of
+--the related entities but also the attributes of these entities. You will get extra
+--credit if you can print all the attributes of the related entities on one line.
+--For example: if E3 has a1 and a2 instead of printing
+--E1, E3, a1
+--E1, E3, a2
+--You print
+--E1, E3, a1, a2
+
+Create view Ents_2hops_attr AS
+select distinct c1.ename as Ent1,c2.ename as ent2,c1.aname||','||c2.aname as Attr
+from contains c1,contains c2
+where (c1.ename,c2.ename) in
+(
+select distinct r1.ename as entity1,r3.ename as entity2
+from relates r1 inner join 
+relates r2
+on
+r1.rname=r2.rname
+inner join
+relates r3
+on r2.ename!=r3.ename
+where r3.ename<r2.ename
+and
+r1.ename!=r3.ename
+and r1.ename
+not in
+(
+select distinct r4.ename
+from relates r4,relates r5
+where r4.rname!=r5.rname
+and r4.ename=r5.ename
+)
+and r3.ename
+not in
+(
+select distinct r7.ename
+from relates r6,relates r7
+where r6.rname!=r7.rname
+and r6.ename=r7.ename
+))
+order by c1.ename,c2.ename;
+
+
+--Q3: Rel_2Ent: This view returns the name of each relationship and the entity names
+--connected to the relationship for those relationships that connect to only 2 entities
+--and these entities have more than 2 attributes each.
+
+Create view Rel_2Ent AS
+ select distinct r.rname,c.ename
+ from relates r,contains c,rel_type r1
+ where c.ename
+ in
+ (
+ select ename
+ from contains 
+ where r.ename=contains.ename
+ group by ename
+ having count(ename)>2
+ )
+ and type=2;
+
+--Q4: Spec_Super_Ent: This view returns the name of each specialization, the super
+--type entity name and its attributes
+
+Create view Spec_Super_Ent AS
+select sname,s.ename,c.aname
+from specialization s,contains c
+where c.ename=s.ename;
+
+
+--Q5: Spec_Sub_Ents: This view returns the name of each specialization, 
+--the sub_type entity names and their attributes.
+
+Create view Spec_Sub_Ents AS
+select sname,s.ename,c.aname
+from sub s,contains c
+where c.ename=s.ename;
+
+--
+--
+-- Close the spool file
+spool off;
+
+
+--Surbhi's Solution
+Create view Ents_2hops_attr as
+select distinct e2,e4,aname
+from (select distinct e2,e4,contains.aname
+from (select distinct e2,e4 from
+(select r1.ename as e1,r2.ename as e2 from relates
+r1,relates r2
+where r1.rname=r2.rname
+and
+r1.ename!=r2.ename)
+inner join
+(select r3.ename as e3,r4.ename as e4
+from relates r3,relates r4
+where r3.rname=r4.rname
+and
+r3.ename!=r4.ename)
+on  e1=e3
+where e2<e4
+order by e2)
+left outer join
+contains
+on
+contains.ename=e2
+or contains.ename=e4
+order by e2);
+
+Create view Ents_2hops as
+select distinct e2,e4
+from (select distinct e2,e4 from
+(select r1.ename as e1,r2.ename as e2 from relates
+r1,relates r2
+where r1.rname=r2.rname
+and
+r1.ename!=r2.ename)
+inner join
+(select r3.ename as e3,r4.ename as e4
+from relates r3,relates r4
+where r3.rname=r4.rname
+and
+r3.ename!=r4.ename)
+on  e1=e3
+where e2<e4
+order by e2);
+
+
+

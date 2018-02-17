@@ -1,0 +1,300 @@
+
+CNAME
+---------------
+Cook
+Jones
+Love
+Woods
+Cook
+Jones
+Tomczak
+James
+Woods
+Rahimi
+
+10 rows selected.
+
+SQL> select distinct a2.cname
+  2  from account a1,account a2
+  3  where a2.bname=a1.bname and
+  4  lower(a1.cname)='jones' and
+  5  lower(a2.cname)<>'jones'
+  6  order by a2.cname;
+
+CNAME
+---------------
+Cook
+James
+Love
+Rahimi
+Tomczak
+Woods
+
+6 rows selected.
+
+SQL> select account.cname
+  2  from account, branch
+  3  where lower(branch.bcity) = `minnetonka' AND
+  4  branch.bname = account.bname AND
+  5  EXISTS
+  6  (select loan.cname
+  7  from loan , branch
+  8  where lower(branch.bcity) =`minnetonka' AND
+  9  branch.bname = loan.bname AND
+ 10  loan.cname = account.cname
+ 11  ;
+where lower(branch.bcity) = `minnetonka' AND
+                            *
+ERROR at line 3:
+ORA-00911: invalid character
+
+
+SQL> select account.cname
+  2  from account, branch
+  3  where lower(branch.bcity) = 'minnetonka' AND
+  4  branch.bname = account.bname AND
+  5  EXISTS
+  6  (select loan.cname
+  7  from loan , branch
+  8  where lower(branch.bcity) ='minnetonka' AND
+  9  branch.bname = loan.bname AND
+ 10  loan.cname = account.cname;
+loan.cname = account.cname
+                         *
+ERROR at line 10:
+ORA-00907: missing right parenthesis
+
+
+SQL> select account.cname
+  2  from account, branch
+  3  where lower(branch.bcity) = 'minnetonka' AND
+  4  branch.bname = account.bname AND
+  5  EXISTS
+  6  (select loan.cname
+  7  from loan , branch
+  8  where lower(branch.bcity) ='minnetonka' AND
+  9  branch.bname = loan.bname AND
+ 10  loan.cname = account.cname);
+
+CNAME
+---------------
+Cook
+Cook
+Cook
+
+SQL> select bname
+  2  from Branch
+  3  where assets > all
+  4  (select assets
+  5  from Branch
+  6  where lower(bcity) = `edina');
+ERROR:
+ORA-01756: quoted string not properly terminated
+
+
+SQL> select bname
+  2  from Branch
+  3  where assets > all
+  4  (select assets
+  5  from Branch
+  6  where lower(bcity) = 'edina');
+
+no rows selected
+
+SQL>
+SQL> ;
+  1  select bname
+  2  from Branch
+  3  where assets > all
+  4  (select assets
+  5  from Branch
+  6* where lower(bcity) = 'edina')
+SQL> /
+
+no rows selected
+
+SQL> select bname
+  2  from Branch
+  3  where assets > any
+  4  (select assets
+  5  from Branch
+  6  where lower(bcity) = 'edina');
+
+BNAME
+---------------
+Southdale
+Eight Street
+Airport
+Northtown
+York
+Ridgedale
+
+6 rows selected.
+
+SQL> select bname,assets
+  2  from Branch
+  3  where assets > any
+  4  (select assets
+  5  from Branch
+  6  where lower(bcity) = 'edina');
+
+BNAME               ASSETS
+--------------- ----------
+Southdale           750000
+Eight Street        450000
+Airport             446000
+Northtown           347000
+York                300000
+Ridgedale           150000
+
+6 rows selected.
+
+SQL> select bname,assets
+  2  from Branch
+  3  where lower(bcity)!='edina' and
+  4  assets > any
+  5  (select assets
+  6  from Branch
+  7  where lower(bcity) = 'edina');
+
+BNAME               ASSETS
+--------------- ----------
+Eight Street        450000
+Airport             446000
+Northtown           347000
+Ridgedale           150000
+
+SQL> select bname
+  2  from brach
+  3  where lower(bcity)='edina';
+from brach
+     *
+ERROR at line 2:
+ORA-00942: table or view does not exist
+
+
+SQL> select bname
+  2  from branch
+  3  where lower(bcity)='edina';
+
+BNAME
+---------------
+Southdale
+France
+York
+
+SQL> select cname
+  2  from account
+  3  where lower(bname) In('southdale','frnace','york');
+
+CNAME
+---------------
+Cook
+James
+Jones
+Rahimi
+Rahimi
+Tomczak
+Woods
+Woods
+
+8 rows selected.
+
+SQL> select cname,bname
+  2  from account
+  3  order by cname;
+
+CNAME           BNAME
+--------------- ---------------
+Cook            France
+Cook            York
+Cook            Main
+Cook            Ridgedale
+Cook            Second
+James           York
+Jones           France
+Jones           York
+Love            France
+Love            Main
+Rahimi          Southdale
+
+CNAME           BNAME
+--------------- ---------------
+Rahimi          York
+Tomczak         York
+Woods           York
+Woods           Southdale
+Woods           France
+
+16 rows selected.
+
+SQL> Select distinct a1.cname from account a1
+  2  Where exists
+  3  ( select a3.bname
+  4  from account a3
+  5  where a1.cname = a3.cname);
+
+CNAME
+---------------
+Cook
+James
+Jones
+Love
+Rahimi
+Tomczak
+Woods
+
+7 rows selected.
+
+SQL> select a3.bname
+  2  from account a3
+  3  where a1.cname = a3.cname
+  4  ;
+where a1.cname = a3.cname
+      *
+ERROR at line 3:
+ORA-00904: "A1"."CNAME": invalid identifier
+
+
+SQL> Select distinct a1.cname from account a1
+  2  where NOT EXISTS (
+  3  select bname from branch
+  4  where lower(bcity) = `edina'
+  5  and bname NOT IN
+  6  (select a3.bname
+  7  from account a3
+  8  where a1.cname = a3.cname
+  9  )
+ 10  ) ;
+ERROR:
+ORA-01756: quoted string not properly terminated
+
+
+SQL> Select distinct a1.cname from account a1
+  2  where NOT EXISTS (
+  3  select bname from branch
+  4  where lower(bcity) = 'edina'
+  5  and bname NOT IN
+  6  (select a3.bname
+  7  from account a3
+  8  where a1.cname = a3.cname
+  9  )
+ 10  ) ;
+
+CNAME
+---------------
+Woods
+
+SQL>
+SQL> ;
+  1  Select distinct a1.cname from account a1
+  2  where NOT EXISTS (
+  3  select bname from branch
+  4  where lower(bcity) = 'edina'
+  5  and bname NOT IN
+  6  (select a3.bname
+  7  from account a3
+  8  where a1.cname = a3.cname
+  9  )
+ 10* )
+SQL>

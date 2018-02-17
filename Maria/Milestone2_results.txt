@@ -1,0 +1,155 @@
+SQL> 
+SQL> -- setup the width and height of the page to print
+SQL> --
+SQL> set linesize 80;
+SQL> set pagesize 64;
+SQL> 
+SQL> -- Set echo on so that you can see the input as well in the spool file
+SQL> set echo on;
+SQL> 
+SQL> --
+SQL> -- Team Number: 4
+SQL> -- Team Members: Zolboo Tsogbayar, Mariyam George, Helai Li
+SQL> -- Milestone 2
+SQL> --
+SQL> 
+SQL> --
+SQL> -- reduce the widths of column being printed
+SQL> -- column cname format A10;
+SQL> -- column bname format A15;
+SQL> --
+SQL> --Q1: Ents_2hops: This view returns the name of every entity and entity (or entities)
+SQL> --that are related to the 2 hops away. For example, if E1 is related to E2 via R2
+SQL> --and the E2 is related to E3 via R3 and E2 is related to E4 via R, we want to print
+SQL> --the following 2 lines:
+SQL> --E1, E3
+SQL> --E1, E4
+SQL> 
+SQL> Create view Ents_2hops AS
+  2  select distinct r3.ename as Entity1,r1.ename as Entity2
+  3  from relates r1 inner join
+  4  relates r2
+  5  on
+  6  r1.rname=r2.rname
+  7  inner join
+  8  relates r3
+  9  on r2.ename!=r3.ename
+ 10  where r3.ename<r2.ename
+ 11  and
+ 12  r1.ename!=r3.ename
+ 13  and r1.ename
+ 14  not in
+ 15  (
+ 16  select distinct r4.ename
+ 17  from relates r4,relates r5
+ 18  where r4.rname!=r5.rname
+ 19  and r4.ename=r5.ename
+ 20  )
+ 21  and r3.ename
+ 22  not in
+ 23  (
+ 24  select distinct r7.ename
+ 25  from relates r6,relates r7
+ 26  where r6.rname!=r7.rname
+ 27  and r6.ename=r7.ename
+ 28  );
+
+View created.
+
+SQL> 
+SQL> 
+SQL> --Q2: Ents_2hops_attr: Repeat question 1 but this time print not only the name of
+SQL> --the related entities but also the attributes of these entities. You will get extra
+SQL> --credit if you can print all the attributes of the related entities on one line.
+SQL> --For example: if E3 has a1 and a2 instead of printing
+SQL> --E1, E3, a1
+SQL> --E1, E3, a2
+SQL> --You print
+SQL> --E1, E3, a1, a2
+SQL> 
+SQL> Create view Ents_2hops_attr AS
+  2  select distinct c1.ename as Ent1,c2.ename as ent2,c1.aname||','||c2.aname as Attr
+  3  from contains c1,contains c2
+  4  where (c1.ename,c2.ename) in
+  5  (
+  6  select distinct r1.ename as entity1,r3.ename as entity2
+  7  from relates r1 inner join
+  8  relates r2
+  9  on
+ 10  r1.rname=r2.rname
+ 11  inner join
+ 12  relates r3
+ 13  on r2.ename!=r3.ename
+ 14  where r3.ename<r2.ename
+ 15  and
+ 16  r1.ename!=r3.ename
+ 17  and r1.ename
+ 18  not in
+ 19  (
+ 20  select distinct r4.ename
+ 21  from relates r4,relates r5
+ 22  where r4.rname!=r5.rname
+ 23  and r4.ename=r5.ename
+ 24  )
+ 25  and r3.ename
+ 26  not in
+ 27  (
+ 28  select distinct r7.ename
+ 29  from relates r6,relates r7
+ 30  where r6.rname!=r7.rname
+ 31  and r6.ename=r7.ename
+ 32  ))
+ 33  order by c1.ename,c2.ename;
+
+View created.
+
+SQL> 
+SQL> 
+SQL> --Q3: Rel_2Ent: This view returns the name of each relationship and the entity names
+SQL> --connected to the relationship for those relationships that connect to only 2 entities
+SQL> --and these entities have more than 2 attributes each.
+SQL> 
+SQL> Create view Rel_2Ent AS
+  2   select distinct r.rname,c.ename
+  3   from relates r,contains c,rel_type r1
+  4   where c.ename
+  5   in
+  6   (
+  7   select ename
+  8   from contains
+  9   where r.ename=contains.ename
+ 10   group by ename
+ 11   having count(ename)>2
+ 12   )
+ 13   and type=2;
+
+View created.
+
+SQL> 
+SQL> --Q4: Spec_Super_Ent: This view returns the name of each specialization, the super
+SQL> --type entity name and its attributes
+SQL> 
+SQL> Create view Spec_Super_Ent AS
+  2  select sname,s.ename,c.aname
+  3  from specialization s,contains c
+  4  where c.ename=s.ename;
+
+View created.
+
+SQL> 
+SQL> 
+SQL> --Q5: Spec_Sub_Ents: This view returns the name of each specialization,
+SQL> --the sub_type entity names and their attributes.
+SQL> 
+SQL> Create view Spec_Sub_Ents AS
+  2  select sname,s.ename,c.aname
+  3  from sub s,contains c
+  4  where c.ename=s.ename;
+
+View created.
+
+SQL> 
+SQL> --
+SQL> --
+SQL> -- Close the spool file
+SQL> spool off;

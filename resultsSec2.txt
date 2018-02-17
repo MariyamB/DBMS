@@ -1,0 +1,97 @@
+SQL> 
+SQL> -- setup the width and height of the page to print
+SQL> --
+SQL> set linesize 80;
+SQL> set pagesize 64;
+SQL> 
+SQL> -- Set echo on so that you can see the input as well in the spool file
+SQL> set echo on;
+SQL> 
+SQL> --
+SQL> -- Team Number: 4
+SQL> -- Team Members: Zolboo Tsogbayar, Mariyam George, Helai Li
+SQL> -- Milestone 2
+SQL> --
+SQL> 
+SQL> --
+SQL> -- reduce the widths of column being printed
+SQL> -- column cname format A10;
+SQL> -- column bname format A15;
+SQL> --
+SQL> --Q1:Print the contents of the ents_2hops view.
+SQL> select * from ents_2hops;
+
+ENTITY1                        ENTITY2                                          
+------------------------------ ------------------------------                   
+Room                           grad_student                                     
+
+SQL> 
+SQL> --Q2:Print the contents of the ents_2hops_attr view.
+SQL> select * from ents_2hops_attr;
+
+no rows selected
+
+SQL> 
+SQL> --Q3:Print the contents of the rel_2ent view.
+SQL> select * from  Rel_2Ent;
+
+RNAME                          ENAME                                            
+------------------------------ ------------------------------                   
+advices                        Grant                                            
+consists                       Grant                                            
+
+SQL> 
+SQL> --Q4: Print the contents of the spec_super_ent view.
+SQL> select * from Spec_Super_Ent;
+
+SNAME                          ENAME                                            
+------------------------------ ------------------------------                   
+ANAME                                                                           
+------------------------------                                                  
+ISA                            person                                           
+City                                                                            
+                                                                                
+ISA                            person                                           
+DOB                                                                             
+                                                                                
+must_be                        student                                          
+Degree                                                                          
+                                                                                
+ISA                            person                                           
+FName                                                                           
+                                                                                
+ISA                            person                                           
+LName                                                                           
+                                                                                
+ISA                            person                                           
+Minit                                                                           
+                                                                                
+ISA                            person                                           
+Name                                                                            
+                                                                                
+ISA                            person                                           
+SSN                                                                             
+                                                                                
+ISA                            person                                           
+State                                                                           
+                                                                                
+ISA                            person                                           
+Street                                                                          
+                                                                                
+ISA                            person                                           
+Zip                                                                             
+                                                                                
+ISA                            person                                           
+age                                                                             
+                                                                                
+
+12 rows selected.
+
+SQL> 
+SQL> --Q5: Print the contents of the spec_super_ents view.
+SQL> select * from Spec_Sub_Ents
+  2  
+SQL> --
+SQL> --
+SQL> -- Close the spool file
+SQL> spool off;

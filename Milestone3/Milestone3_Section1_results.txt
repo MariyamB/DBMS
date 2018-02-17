@@ -1,0 +1,407 @@
+SQL> 
+SQL> -- setup the width and height of the page to print
+SQL> --
+SQL> set linesize 80;
+SQL> set pagesize 64;
+SQL> 
+SQL> -- Set echo on so that you can see the input as well in the spool file
+SQL> set echo on;
+SQL> 
+SQL> --
+SQL> -- Team Number: 4
+SQL> -- Team Members: Zolboo Tsogbayar, Mariyam George, Helai Li
+SQL> -- Milestone 3_Section1
+SQL> --
+SQL> --1.Print the contensts of the entity table.
+SQL> select * from entity_type;
+
+ENAME                          TYPE                                             
+------------------------------ --------------------                             
+faculty                        p                                                
+student                        p                                                
+grad_student                   p                                                
+UG_student                     p                                                
+Section                        p                                                
+Room                           p                                                
+person                         p                                                
+Course                         p                                                
+Department                     p                                                
+Grant                          p                                                
+reg_for                        p                                                
+
+11 rows selected.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> --2.Print the contensts of the attribute table.
+SQL> select * from attr_type;
+
+ANAME                          M                                                
+------------------------------ -                                                
+SSN                            N                                                
+DOB                            N                                                
+Street                         Y                                                
+City                           Y                                                
+State                          Y                                                
+Zip                            Y                                                
+Salary                         N                                                
+Is_Tenured                     N                                                
+Degree                         Y                                                
+Grade                          Y                                                
+Sec#                           Y                                                
+C#                             Y                                                
+CName                          Y                                                
+No_Of_Faculty                  Y                                                
+Dname                          Y                                                
+Date                           n                                                
+Title                          n                                                
+Amt                            n                                                
+Name                           y                                                
+FName                          n                                                
+LName                          n                                                
+Minit                          n                                                
+age                            n                                                
+rm                             n                                                
+
+24 rows selected.
+
+SQL> 
+SQL> 
+SQL> --3.Print the contensts of the relates table.
+SQL> select * from relates;
+
+RNAME                          ENAME                          ROLE              
+------------------------------ ------------------------------ ----------        
+CARDINALIT   MIN_CARD   MAX_CARD                                                
+---------- ---------- ----------                                                
+advices                        faculty                        faculty           
+1                                                                               
+                                                                                
+owns                           faculty                        faculty           
+M                                                                               
+                                                                                
+teaches                        Course                         Course            
+M                                                                               
+                                                                                
+consists                       Grant                          CG                
+M                                                                               
+                                                                                
+consists                       Grant                          PG                
+1                                                                               
+                                                                                
+advices                        grad_student                   grad              
+M                                                                               
+                                                                                
+teaches                        faculty                        faculty           
+1                                                                               
+                                                                                
+chairs                         faculty                        faculty           
+1                                                                               
+                                                                                
+works_in                       faculty                        faculty           
+M                                                                               
+                                                                                
+advices                        Grant                          Grant             
+M                                                                               
+                                                                                
+chairs                         Department                     Department        
+1                                                                               
+                                                                                
+works_in                       Department                     Department        
+1                                                                               
+                                                                                
+offers                         Department                     Department        
+M                                                                               
+                                                                                
+offers                         Course                         Course            
+M                                                                               
+                                                                                
+has                            Course                         Course            
+1                                                                               
+                                                                                
+has                            Section                        Section           
+M                                                                               
+                                                                                
+is_held_in                     Section                        Section           
+M                                                                               
+                                                                                
+is_held_in                     Room                           Room              
+1                                                                               
+                                                                                
+
+18 rows selected.
+
+SQL> --4.Print the contensts of the contains table.
+SQL> select * from contains;
+
+ANAME                          ENAME                                            
+------------------------------ ------------------------------                   
+DATA_TYPE                      I KEY_TYPE                                       
+------------------------------ - ----------                                     
+City                           person                                           
+varchar(10)                    N attribute                                      
+                                                                                
+State                          person                                           
+char(2)                        N attribute                                      
+                                                                                
+Zip                            person                                           
+number(5)                      N attribute                                      
+                                                                                
+SSN                            person                                           
+number(9)                      Y primary                                        
+                                                                                
+DOB                            person                                           
+Date                           N attribute                                      
+                                                                                
+Street                         person                                           
+varchar(10)                    N attribute                                      
+                                                                                
+Name                           person                                           
+varchar(21)                    N attribute                                      
+                                                                                
+Minit                          person                                           
+char(1)                        N contained                                      
+                                                                                
+LName                          person                                           
+varchar(10)                    N contained                                      
+                                                                                
+FName                          person                                           
+varchar(10)                    N contained                                      
+                                                                                
+Salary                         faculty                                          
+decimal(10,2)                  N attribute                                      
+                                                                                
+Is_Tenured                     faculty                                          
+boolean                        N attribute                                      
+                                                                                
+Degree                         student                                          
+char(3)                        N attribute                                      
+                                                                                
+Date                           Section                                          
+Date                           N attribute                                      
+                                                                                
+C#                             Course                                           
+char(5)                        Y primary                                        
+                                                                                
+CName                          Course                                           
+varchar(10)                    N attribute                                      
+                                                                                
+Dname                          Department                                       
+varchar(10)                    Y primary                                        
+                                                                                
+No_Of_Faculty                  Department                                       
+numer(5)                       N contained                                      
+                                                                                
+Date                           Grant                                            
+Date                           N contained                                      
+                                                                                
+Title                          Grant                                            
+char(100)                      Y primary                                        
+
+ANAME                          ENAME                                            
+------------------------------ ------------------------------                   
+DATA_TYPE                      I KEY_TYPE                                       
+------------------------------ - ----------                                     
+                                                                                
+Amt                            Grant                                            
+decimal(20,2)                  N contained                                      
+                                                                                
+Date                           reg_for                                          
+Date                           N contained                                      
+                                                                                
+Grade                          reg_for                                          
+varchar                        N contained                                      
+                                                                                
+age                            person                                           
+number(4)                      N derived                                        
+                                                                                
+Sec#                           Section                                          
+char(7)                        Y primary                                        
+                                                                                
+rm                             Room                                             
+numer(3)                       Y primary                                        
+                                                                                
+
+26 rows selected.
+
+SQL> --5.Print the contensts of the derives table.
+SQL> select * from derives;
+
+ANAME                          BASE_ANAME                                       
+------------------------------ ------------------------------                   
+DATA_TYPE                                                                       
+------------------------------                                                  
+No_Of_Faculty                  Name                                             
+number(5)                                                                       
+                                                                                
+age                            DOB                                              
+char                                                                            
+                                                                                
+
+SQL> 
+SQL> --6.Print the contensts of the rel_type table.
+SQL> select * from rel_type;
+
+RNAME                          TYPE                                             
+------------------------------ --------------------                             
+advices                        3                                                
+owns                           2                                                
+teaches                        2                                                
+chairs                         2                                                
+works_in                       2                                                
+offers                         2                                                
+consists                       2                                                
+has                            2                                                
+is_held_in                     2                                                
+registers_for                  2                                                
+
+10 rows selected.
+
+SQL> --7.Print the contensts of the is_in table.
+SQL> select * from is_in;
+
+ANAME                          COMPOSITE_ANAME                                  
+------------------------------ ------------------------------                   
+DATA_TYPE                                                                       
+------------------------------                                                  
+FName                          Name                                             
+varchar(10)                                                                     
+                                                                                
+LName                          Name                                             
+varchar(10)                                                                     
+                                                                                
+Minit                          Name                                             
+char(1)                                                                         
+                                                                                
+
+SQL> 
+SQL> --8.Print the contensts of the is_used_by table.
+SQL> select * from is_used_by;
+
+RNAME                          ANAME                                            
+------------------------------ ------------------------------                   
+DATA_TYPE                                                                       
+------------------------------                                                  
+advices                        Is_Tenured                                       
+char(10)                                                                        
+                                                                                
+advices                        Title                                            
+char(10)                                                                        
+                                                                                
+teaches                        Is_Tenured                                       
+char(10)                                                                        
+                                                                                
+works_in                       Title                                            
+char(10)                                                                        
+                                                                                
+advices                        Salary                                           
+char                                                                            
+                                                                                
+advices                        Date                                             
+char                                                                            
+                                                                                
+advices                        Amt                                              
+char                                                                            
+                                                                                
+chairs                         Salary                                           
+char                                                                            
+                                                                                
+chairs                         Dname                                            
+char                                                                            
+                                                                                
+chairs                         No_Of_Faculty                                    
+char                                                                            
+                                                                                
+works_in                       Salary                                           
+char                                                                            
+                                                                                
+works_in                       Dname                                            
+char                                                                            
+                                                                                
+works_in                       No_Of_Faculty                                    
+char                                                                            
+                                                                                
+teaches                        Salary                                           
+char                                                                            
+                                                                                
+teaches                        C#                                               
+char                                                                            
+                                                                                
+teaches                        CName                                            
+char                                                                            
+                                                                                
+offers                         Dname                                            
+char                                                                            
+                                                                                
+offers                         No_Of_Faculty                                    
+char                                                                            
+                                                                                
+offers                         C#                                               
+char                                                                            
+                                                                                
+offers                         CName                                            
+char                                                                            
+
+RNAME                          ANAME                                            
+------------------------------ ------------------------------                   
+DATA_TYPE                                                                       
+------------------------------                                                  
+                                                                                
+has                            C#                                               
+char                                                                            
+                                                                                
+has                            CName                                            
+char                                                                            
+                                                                                
+has                            Sec#                                             
+char                                                                            
+                                                                                
+has                            Date                                             
+char                                                                            
+                                                                                
+is_held_in                     Sec#                                             
+char                                                                            
+                                                                                
+is_held_in                     Date                                             
+char                                                                            
+                                                                                
+chairs                         Is_Tenured                                       
+char                                                                            
+                                                                                
+is_held_in                     rm                                               
+char                                                                            
+                                                                                
+
+28 rows selected.
+
+SQL> 
+SQL> 
+SQL> --9.Print the contensts of the specialization table.
+SQL> select * from specialization;
+
+SNAME                          ENAME                          T O               
+------------------------------ ------------------------------ - -               
+ISA                            person                         n Y               
+must_be                        student                        n N               
+
+SQL> 
+SQL> --10.Print the contensts of the sub table.
+SQL> 
+SQL> select * from sub;
+
+ENAME                          SNAME                                            
+------------------------------ ------------------------------                   
+UG_student                     must_be                                          
+faculty                        ISA                                              
+grad_student                   must_be                                          
+student                        ISA                                              
+
+SQL> --
+SQL> -- reduce the widths of column being printed
+SQL> -- column cname format A10;
+SQL> -- column bname format A15;
+SQL> --
+SQL> --
+SQL> -- Close the spool file
+SQL> spool off;

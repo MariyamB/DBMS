@@ -1,0 +1,162 @@
+SQL> 
+SQL> --
+SQL> -- Team Number: 4
+SQL> -- Team Members: Helai Li, Mariyam Rajeev George,Zolboo Tsogbayar
+SQL> -- My SQL Statements
+SQL> --
+SQL> 
+SQL> --
+SQL> -- reduce the widths of column being printed
+SQL> -- column cname format A10;
+SQL> -- column bname format A15;
+SQL> --
+SQL> --Q1:
+SQL> --Display the names of the customers in mpls
+SQL> --with an account bal more than 1200
+SQL> --in any branch other than france branch
+SQL> --or customers who live in edina and have only one loan in frnace branch
+SQL> 
+SQL> select c1.cname
+  2  from customer c1,account a1
+  3  where lower(c1.ccity)='mpls'
+  4  and
+  5  a1.bal>1200
+  6  and
+  7  c1.cname=a1.cname
+  8  and
+  9  lower(a1.bname)<>'france'
+ 10  union
+ 11  select c2.cname
+ 12  from customer c2,loan l2
+ 13  where lower(c2.ccity)='edina'
+ 14  and
+ 15  lower(l2.bname)='france'
+ 16  and
+ 17  c2.cname=l2.cname
+ 18  and
+ 19  c2.cname in
+ 20  (
+ 21  select cname
+ 22  from loan
+ 23  group by cname
+ 24  having count(*)=1);
+
+CNAME                                                                           
+---------------                                                                 
+Cook                                                                            
+James                                                                           
+
+SQL> 
+SQL> -- Q2:
+SQL> --Display the customers who have accoutn bal>1800and loan of amount 800.
+SQL> 
+SQL> select cname
+  2  from account
+  3  where bal>1800
+  4  and
+  5  exists
+  6  (select cname
+  7  from loan
+  8  where amt=800);
+
+no rows selected
+
+SQL> 
+SQL> --Q3:
+SQL> --Display the branch name and the aasset name of all branches that
+SQL> --have the assets greater than any asset in edina and have one or more accounts holders
+SQL> --in minnetonka and avg balance of the customers account is more than $400
+SQL> 
+SQL> select distinct branch.bname,assets
+  2  from branch
+  3  where assets > any
+  4  (
+  5  select assets
+  6  from branch
+  7  where lower(bcity)='edina')
+  8  and lower(bcity)<>'edina'
+  9  and
+ 10  bname
+ 11  in
+ 12  (
+ 13  select account.bname
+ 14  from account,customer
+ 15  where
+ 16  lower(ccity)='minnetonka'
+ 17  and
+ 18  customer.cname=account.cname
+ 19  group by account.bname
+ 20  having avg(bal)>400
+ 21  );
+
+no rows selected
+
+SQL> 
+SQL> --Q4:
+SQL> --Display the names of branches in EDINA with assets more than 40000
+SQL> --and also have loan in eden prairie with amt more than 1000
+SQL> select distinct branch.bname
+  2  from loan,branch,customer
+  3  where lower(bcity)='edina'
+  4  and
+  5  assets>40000
+  6  and
+  7  amt>1000
+  8  and
+  9  branch.bname=loan.bname
+ 10  and
+ 11  lower(ccity)='eden prairie';
+
+BNAME                                                                           
+---------------                                                                 
+France                                                                          
+York                                                                            
+Southdale                                                                       
+
+SQL> 
+SQL> --Q5:
+SQL> --Display the customers who live in minnetonka
+SQL> --and have accounts in any branch in edina
+SQL> --and the names of customers who have loan accounts in all branches in EDINA
+SQL> --with assets less than that of 100000
+SQL> select customer.cname
+  2  from customer,account
+  3  where lower(ccity)='minnetonka'
+  4  and
+  5  bname in
+  6  (
+  7  select bname
+  8  from branch
+  9  where lower(bcity)='edina')
+ 10  and
+ 11  customer.cname=account.cname
+ 12  intersect
+ 13  select cname
+ 14  from branch,loan
+ 15  where
+ 16  cname in
+ 17  (
+ 18  select distinct l4.cname
+ 19   from loan l4
+ 20  where not exists
+ 21  (
+ 22  select bname
+ 23  from branch
+ 24  where lower(bcity)='edina'
+ 25  and
+ 26  bname
+ 27  not in
+ 28  (
+ 29  select l6.bname
+ 30  from loan l6
+ 31  where l4.cname=l6.cname
+ 32  )
+ 33  )
+ 34  )
+ 35  and assets<100000;
+
+no rows selected
+
+SQL> 
+SQL> -- Close the spool file
+SQL> spool off;

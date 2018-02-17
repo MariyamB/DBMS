@@ -1,0 +1,244 @@
+SQL> 
+SQL> --
+SQL> -- Team Number: 4
+SQL> -- Team Members: Zolboo Tsogbayar, Mariyam George, Helai Li
+SQL> -- Milestone 3
+SQL> --
+SQL> --1.Print the name of relationships and the entities they relate for those relationships
+SQL> --that all entities they connect to have a pkey.
+SQL> 
+SQL> select rel1.RNAME,rel1.ename
+  2  from RELATES rel1 left join CONTAINS con1
+  3  on rel1.ENAME=con1.ENAME
+  4  where lower(con1.IS_KEY) = 'y'
+  5  and lower(con1.KEY_TYPE) = 'primary'
+  6  and rel1.rname
+  7  not in
+  8  (
+  9  select rel.RNAME
+ 10  from RELATES rel left join CONTAINS con
+ 11  on rel.ENAME=con.ENAME
+ 12  where lower(con.IS_KEY) = 'y'
+ 13  and lower(con.KEY_TYPE) = 'primary'
+ 14  group by rel.rname
+ 15  having count(rel.rname)!=2
+ 16  );
+
+RNAME                          ENAME                                            
+------------------------------ ------------------------------                   
+consists                       Grant                                            
+consists                       Grant                                            
+has                            Course                                           
+has                            Section                                          
+is_held_in                     Room                                             
+is_held_in                     Section                                          
+offers                         Course                                           
+offers                         Department                                       
+
+8 rows selected.
+
+SQL> 
+SQL> 
+SQL> --2.Print the relationship name and the entities they relate for those relationships
+SQL> --tthat have degreee 3.
+SQL> select distinct contains.ename,aname,r1.rname
+  2  from contains,relates r1
+  3  where r1.rname
+  4  in
+  5  (
+  6  select rname from
+  7  relates
+  8  group by rname
+  9  having count(rname)=3)
+ 10  and
+ 11  r1.ename=contains.ename;
+
+ENAME                          ANAME                                            
+------------------------------ ------------------------------                   
+RNAME                                                                           
+------------------------------                                                  
+Grant                          Date                                             
+advices                                                                         
+                                                                                
+Grant                          Title                                            
+advices                                                                         
+                                                                                
+Grant                          Amt                                              
+advices                                                                         
+                                                                                
+faculty                        Is_Tenured                                       
+advices                                                                         
+                                                                                
+faculty                        Salary                                           
+advices                                                                         
+                                                                                
+
+SQL> 
+SQL> 
+SQL> --3.Print the name of entities that are 2 hops away from entity Course and have either one or more multi-valued attributes OR one or more attributes with data type Date
+SQL> 
+SQL> select distinct e2h.ent2
+  2  from ents_2hops e2h
+  3  join contains c
+  4  on e2h.related_entity=c.ename
+  5  join attr_type a
+  6  where lower(e2h.ent1)='course'
+  7  and lower(a.multi_valued)='y'
+  8  or lower(c.data_type)='date');
+where lower(e2h.ent1)='course'
+*
+ERROR at line 6:
+ORA-00905: missing keyword 
+
+
+SQL> 
+SQL> --4.Print the name of an entity and its attribute names if the entry has two attributes
+SQL> -- and the enity oarticipates with cardinality of m in 2 of the relationships it connects to.
+SQL> select distinct ename,aname
+  2  from contains
+  3  where
+  4  contains.ename in
+  5  (
+  6  select ename
+  7  from contains
+  8  group by ename
+  9  having count(aname)=2
+ 10  intersect
+ 11  select ename
+ 12  from relates
+ 13  where cardinality='M'
+ 14  group by ename
+ 15  having count(role)>1
+ 16  )
+ 17  order by contains.ename;
+
+ENAME                          ANAME                                            
+------------------------------ ------------------------------                   
+Course                         C#                                               
+Course                         CName                                            
+Section                        Date                                             
+Section                        Sec#                                             
+faculty                        Salary                                           
+faculty                        Is_Tenured                                       
+
+6 rows selected.
+
+SQL> 
+SQL> --5.Print the name of each entity and the attributes of the entities that participate in exactly 3 relationships with cardinality of ‘M’.
+SQL> select distinct contains.ename,contains.aname
+  2  from relates,rel_type,contains
+  3  where
+  4  type=3
+  5  and
+  6  rel_type.rname=relates.rname
+  7  and
+  8  contains.ename=relates.ename
+  9  and
+ 10  cardinality='M';
+
+ENAME                          ANAME                                            
+------------------------------ ------------------------------                   
+Grant                          Title                                            
+Grant                          Amt                                              
+Grant                          Date                                             
+
+SQL> 
+SQL> 
+SQL> --6.Print the name of entities or relationships that have Date as the data type of one of their attributes
+SQL> 
+SQL> select con.ENAME as ENAME_OR_RNAME
+  2  from CONTAINS con
+  3  where lower(con.DATA_TYPE) = 'date'
+  4  union all
+  5  select iub.RNAME
+  6  from IS_USED_BY iub
+  7  where lower(iub.DATA_TYPE) = 'date';
+
+ENAME_OR_RNAME                                                                  
+------------------------------                                                  
+person                                                                          
+Section                                                                         
+Grant                                                                           
+reg_for                                                                         
+
+SQL> 
+SQL> --7.Print the name of all composite attributes and their component attributes.
+SQL> 
+SQL> select ii.Composite_ANAME,ii.ANAME
+  2  from IS_IN ii;
+
+COMPOSITE_ANAME                ANAME                                            
+------------------------------ ------------------------------                   
+Name                           FName                                            
+Name                           LName                                            
+Name                           Minit                                            
+
+SQL> 
+SQL> --8.Print the name of all entities that have one or more derived attributes,
+SQL> --the name of all derived attributes and what they are driven from.
+SQL> 
+SQL> select con.ENAME,d.ANAME,d.Base_ANAME
+  2  from CONTAINS con right join DERIVES d
+  3  on con.ANAME=d.ANAME;
+
+ENAME                          ANAME                                            
+------------------------------ ------------------------------                   
+BASE_ANAME                                                                      
+------------------------------                                                  
+Department                     No_Of_Faculty                                    
+Name                                                                            
+                                                                                
+person                         age                                              
+DOB                                                                             
+                                                                                
+
+SQL> 
+SQL> --9.Print the entity name and entities it relates to for those entities
+SQL> --that participate as both the super type(s) or subtype(s) of specializations.
+SQL> 
+SQL> select ename,count(aname) as AttributeCount
+  2  from contains where ename='person'
+  3  group by ename;
+
+ENAME                          ATTRIBUTECOUNT                                   
+------------------------------ --------------                                   
+person                                     11                                   
+
+SQL> 
+SQL> --10.Print the name of all specialization, their subtype entity, a
+SQL> --and the subtype entity attribute names (one line per entity and attribute combination).
+SQL> 
+SQL> select spe.SNAME,con.ENAME,con.ANAME
+  2  from sub spe left join CONTAINS con
+  3  on spe.ENAME=con.ENAME;
+
+SNAME                          ENAME                                            
+------------------------------ ------------------------------                   
+ANAME                                                                           
+------------------------------                                                  
+ISA                            student                                          
+Degree                                                                          
+                                                                                
+ISA                            faculty                                          
+Is_Tenured                                                                      
+                                                                                
+ISA                            faculty                                          
+Salary                                                                          
+                                                                                
+must_be                                                                         
+                                                                                
+                                                                                
+must_be                                                                         
+                                                                                
+                                                                                
+
+SQL> 
+SQL> 
+SQL> --
+SQL> -- reduce the widths of column being printed
+SQL> -- column cname format A10;
+SQL> -- column bname format A15;
+SQL> --
+SQL> --
+SQL> -- Close the spool file
+SQL> spool off;

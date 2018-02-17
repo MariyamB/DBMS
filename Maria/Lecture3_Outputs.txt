@@ -1,0 +1,58 @@
+SQL> 
+SQL> --
+SQL> -- Team Number: 100
+SQL> -- Team Members: Saeed Rahimi, John Doe
+SQL> -- My SQL Statements
+SQL> --
+SQL> 
+SQL> --
+SQL> -- reduce the widths of column being printed
+SQL> -- column cname format A10;
+SQL> -- column bname format A15;
+SQL> --
+SQL> -- Q1: Print the name of all customers in the bank.
+SQL> Select cname from customer;
+
+CNAME                                                                           
+---------------                                                                 
+Baba                                                                            
+Cook                                                                            
+Erickson                                                                        
+Ireland                                                                         
+James                                                                           
+Janzen                                                                          
+Johnson                                                                         
+Jones                                                                           
+Love                                                                            
+Melcher                                                                         
+Rahimi                                                                          
+Tomcat                                                                          
+Tomczak                                                                         
+Tones                                                                           
+Woods                                                                           
+
+15 rows selected.
+
+SQL> --
+SQL> -- Q2: Print the name of all branches in the bank
+SQL> Select bname from branch;
+
+BNAME                                                                           
+---------------                                                                 
+3rd Street                                                                      
+Airport                                                                         
+Eight Street                                                                    
+France                                                                          
+Main                                                                            
+Northtown                                                                       
+Ridgedale                                                                       
+Second                                                                          
+Southdale                                                                       
+York                                                                            
+
+10 rows selected.
+
+SQL> --
+SQL> --
+SQL> -- Close the spool file
+SQL> spool off;
